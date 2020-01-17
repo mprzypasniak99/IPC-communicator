@@ -1,0 +1,14 @@
+3
+group1
+group2
+group3
+9
+user1 pwd
+user2 123
+user3 hhh
+user4 fyi
+user5 tfw
+user6 mmm
+user7 vim
+user8 loop
+user9 csv

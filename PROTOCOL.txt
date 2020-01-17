@@ -1,0 +1,14 @@
+PROTOKÓŁ KOMUNIKACJI
+
+Aplikacje serwera i klienta używają do komunikacji kolejek komunikatów. W komunikacji wykorzystywane są różne typy komunikatów do obsługi różnych żądań:
+
+- 1 : żądanie wysyłane przez klienta dotyczące zalogowania. Oprócz typu, przesyłany komunikat zawiera dwa pola będące łańcuchami znaków: login i hasło, oraz pole typu integer będące numerem identyfikatorem kolejki, którą serwer ma dostarczać komunikaty do danego klienta. Serwer sprawdza poprawność danych i wysyła spowrotem komunikat tego samego typu z wiadomością dotyczącą powodzenia lub porażki przy logowaniu.
+- 2 : żądanie wylogowania wysyłane przez klienta. Zawiera łańcuch znaków z nazwą użytkownika, który ma zostać wylogowany. Serwer zmienia status użytkownika i wysyła do wszystkich klientów informację o wylogowaniu tego użytkownika.
+- 3 : żądanie klienta o przesłanie listy zalogowanych użytkowników. Serwer odpowiada komunikatem z tablicą nazw użytkowników.
+- 4 : żądanie wysyłane przez klienta, zawierające nazwę grupy tematycznej. Serwer odbiera żądanie i wysyła do klienta tablicę łańcuchów znaków z nazwami użytkowników należących do danej grupy
+- 5 : żądanie wysyłane przez klienta, zawierające nazwę grupy tematycznej, do której użytkownik chce się zapisać. Serwer przetwarza komunikat i wysyła zwrotnie informację o sukcesie lub porażce w dopisaniu do grupy.
+- 6 : żądanie dotyczące wypisania z grupy, której nazwa podana jest w komunikacie. Serwer przetwarza informację i wysyła komunikat o powodzeniu lub porażce zleconej operacji.
+- 7 : komunikat wysyłany przez klienta zawierający nazwę użytkownika. Jest to żądanie przesłania listy dostępnych grup tematycznych. Serwer przetwarza informację i zwrotnie wysyła tablicę z nazwami dostępnych grup.
+- 8 : komunikat wysyłany przez klienta, zawiera nazwę grupy i treść wiadomości (jako łańcuchy znaków). Serwer odbiera komunikat i wysyła wiadomość kolejno do wszystkich członków grupy, wraz z nazwą użytkownika który jest autorem wiadomości.
+- 9 : komunikat wysyłany przez klienta, zawierającu nazwę użytkownika, do którego skierowana jest wiadomość. Serwer odbiera komunikat i wysyła wiadomość do adresata, wraz z nazwą użytkownika, który jest autorem wiadomości
+- 10 : typ komunikatu, który serwer nadaje wiadomości po przetworzeniu żądania o jej wysłanie do określonego użytkownika lub grupy
