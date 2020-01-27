@@ -2,8 +2,10 @@ PROTOKÓŁ KOMUNIKACJI
 
 Aplikacje serwera i klienta używają do komunikacji kolejek komunikatów. W komunikacji wykorzystywane są różne typy komunikatów do obsługi różnych żądań:
 
-- 1 : żądanie wysyłane przez klienta dotyczące zalogowania. Oprócz typu, przesyłany komunikat zawiera dwa pola będące łańcuchami znaków: login i hasło, oraz pole typu integer będące numerem identyfikatorem kolejki, którą serwer ma dostarczać komunikaty do danego klienta. Serwer sprawdza poprawność danych i wysyła spowrotem komunikat tego samego typu z wiadomością dotyczącą powodzenia lub porażki przy logowaniu.
-- 2 : żądanie wylogowania wysyłane przez klienta. Zawiera łańcuch znaków z nazwą użytkownika, który ma zostać wylogowany. Serwer zmienia status użytkownika i wysyła do wszystkich klientów informację o wylogowaniu tego użytkownika.
+- 1 : żądanie wysyłane przez klienta dotyczące zalogowania. Oprócz typu, przesyłany komunikat zawiera dwa pola będące łańcuchami znaków: login i hasło, oraz pole typu integer będące numerem identyfikatorem kolejki, którą serwer ma dostarczać komunikaty do danego klienta. Serwer sprawdza poprawność danych i wysyła spowrotem komunikat tego samego typu z wiadomością dotyczącą powodzenia lub porażki przy logowaniu. Liczba przesłana w komunikacie oznacza przebieg weryfikacji i decyzję serwera.
+Jeśli jest mniejsza od stałej LOGIN_ATTEMPTS_ALLOWED, klient wyświetla informację o błędnie wprowadzonym haśle i liczbę pozostałych prób przed zablokowaniem. -1 oznacza brak użytkownika w bazie. 0 oznacza udane zalogowanie. Liczba równa stałej LOGIN_ATTEMPTS_ALLOWED oznacza, że konto jest zablokowane, a większa od stałej o 1 oznacza, że użytkownik jest już zalogowany.
+- 2 : żądanie wylogowania wysyłane przez klienta. Zawiera łańcuch znaków z nazwą użytkownika, który ma zostać wylogowany. Serwer usuwa wskaźnik na strukturę użytkownika
+w tablicy użytkowników zalogowanych.
 - 3 : żądanie klienta o przesłanie listy zalogowanych użytkowników. Serwer odpowiada komunikatem z tablicą nazw użytkowników.
 - 4 : żądanie wysyłane przez klienta, zawierające nazwę grupy tematycznej. Serwer odbiera żądanie i wysyła do klienta tablicę łańcuchów znaków z nazwami użytkowników należących do danej grupy
 - 5 : żądanie wysyłane przez klienta, zawierające nazwę grupy tematycznej, do której użytkownik chce się zapisać. Serwer przetwarza komunikat i wysyła zwrotnie informację o sukcesie lub porażce w dopisaniu do grupy.
@@ -11,4 +13,21 @@ Aplikacje serwera i klienta używają do komunikacji kolejek komunikatów. W kom
 - 7 : komunikat wysyłany przez klienta zawierający nazwę użytkownika. Jest to żądanie przesłania listy dostępnych grup tematycznych. Serwer przetwarza informację i zwrotnie wysyła tablicę z nazwami dostępnych grup.
 - 8 : komunikat wysyłany przez klienta, zawiera nazwę grupy i treść wiadomości (jako łańcuchy znaków). Serwer odbiera komunikat i wysyła wiadomość kolejno do wszystkich członków grupy, wraz z nazwą użytkownika który jest autorem wiadomości.
 - 9 : komunikat wysyłany przez klienta, zawierającu nazwę użytkownika, do którego skierowana jest wiadomość. Serwer odbiera komunikat i wysyła wiadomość do adresata, wraz z nazwą użytkownika, który jest autorem wiadomości
-- 10 : typ komunikatu, który serwer nadaje wiadomości po przetworzeniu żądania o jej wysłanie do określonego użytkownika lub grupy
+- 10 i 11 : komunikaty, które klient wysyła do serwera, kiedy użytkownik chce zablokować wiadomości od innego użytkownika, lub grupy. Serwer sprawdza czy podany użytkownik, lub grupa istnieją. Jeśli tak, to wysyła wiadomość zwrotną o sukcesie w komunikacie typu 12 i klient dopisuje użytkownika, lub grupę na listę zablokowanych. Jeśli nie, klient nie dopisuje nieprawidłowej nazwy i wyświetla informację o niepowodzeniu operacji.
+Serwer używa tego typu komunikatów do przesłania wiadomości otrzymanej w komunikacie typu 8 lub 9, do wskazanego użytkownika, lub grupy.
+- 12 : tak jak było wspomniane powyżej, serwer używa tego typu komunikatu do poinformowania u sukcesie lub porażce w zablokowaniu użytkownika lub grupy.
+
+Użyte struktury:
+
+-wyłącznie w serwerze:
+    -user:  zawiera dwie tablice znaków : nazwę użytownika i hasło odczytane z pliku config, oraz dwie liczby: deskryptor kolejki komunikatów, na którą serwer wysyła
+            wiadomości zwrotne, oraz liczbę nieudanych prób zalogowania.
+    -group: zawiera tablicę znaków z nazwą grupy, oraz tablicę wskaźników na użytkowników należących do niej.
+-współdzielone:
+    -login: składa się z liczby typu long będącej typem komunikatu, łańcuchy znaków z loginem i hasłem, oraz deskryptor kolejki komunikatów należącej do klienta,
+            którego został wysłany ten komunikat. Służy do logowania się do komunikatora.
+    -success: zawiera liczbę będącą typem komunikatu i liczbę int służącą w komunikatach do przekazania prostych informacji o sukcesie lub porażce danej operacji
+    -one_line: oprócz typu komunikatu zawiera łańcuch znaków. Wykorzystywana przy żądaniach o przesłanie listy użytkowników zalogowanych, lub w grupie.
+    -two_line: zawiera pola będące łańcuchami znaków : msg i usr_name. Służy do wykonywania operacji związanych z grupami.
+    -group_tab: oprócz typu zawiera dwuwymiarową tablicę znaków. Służy do przesyłania przez serwer listy użytkowników zalogowanych, lub należących do danej grupy
+    -message:   zawiera typ, i łańcuchy znaków z nazwą nadawcy, adresata(użytkownika lub grupy) i treścią wiadomości.

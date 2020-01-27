@@ -17,12 +17,6 @@ struct user
     int failed_login;
 };
 
-struct list
-{
-    struct user *this;
-    struct list *next;
-};
-
 struct group
 {
     char name[64];
