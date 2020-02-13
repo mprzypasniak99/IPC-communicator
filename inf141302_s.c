@@ -109,7 +109,7 @@ int main()
     
     while(1)
     {
-        if( msgrcv(pub_queue, &request, 132, 1, IPC_NOWAIT) != -1) //obsługa zapytań o logowanie
+        if( msgrcv(pub_queue, &request, 132, 1, IPC_NOWAIT) != -1) //handling login requests
         {
             struct success tmp;
             tmp.mtype = 1;
@@ -178,7 +178,7 @@ int main()
             
             msgsnd(request.id, &tmp, sizeof(int), 0);
         }
-        if(msgrcv(pub_queue, &one, 256, 2, IPC_NOWAIT) != -1) // obsługa żądań wylogowania
+        if(msgrcv(pub_queue, &one, 256, 2, IPC_NOWAIT) != -1) // handling log out requests
         {
             for(int i = 0; i < 100 && logged_in[i] != NULL; i++)
             {
@@ -189,7 +189,7 @@ int main()
                 }
             }
         }
-        if(msgrcv(pub_queue, &one, 256, 3, IPC_NOWAIT) != -1) //obsługa żądania o przesłanie listy zalogowanych użytkowników
+        if(msgrcv(pub_queue, &one, 256, 3, IPC_NOWAIT) != -1) //handling requests for sending list of logged in users
         {
             if(fork() == 0)
             {
@@ -214,7 +214,7 @@ int main()
                 }
             }
         }
-        if(msgrcv(pub_queue, &group_reqest, 128, 4, IPC_NOWAIT) != -1) //obsługa zapytania o członków grupy
+        if(msgrcv(pub_queue, &group_reqest, 128, 4, IPC_NOWAIT) != -1) //handling requests for list of group members
         {
             if(fork() == 0)
             {
@@ -260,7 +260,7 @@ int main()
                 exit(0);
             }
         }
-        if(msgrcv(pub_queue, &group_reqest, 128, 5, IPC_NOWAIT) != -1) //zapytanie o zapisanie do grupy
+        if(msgrcv(pub_queue, &group_reqest, 128, 5, IPC_NOWAIT) != -1) //handling requests for joining a group
         {
             struct user *tmp = NULL;
             for(int i = 0; i < 100; i++)
@@ -304,7 +304,7 @@ int main()
                 msgsnd(tmp->msg, &s, sizeof(int), 0);
             }
         }
-        if(msgrcv(pub_queue, &group_reqest, 128, 6, IPC_NOWAIT) != -1) //zapytanie o wypisanie z grupy
+        if(msgrcv(pub_queue, &group_reqest, 128, 6, IPC_NOWAIT) != -1) //handling requests for leaving a group
         {
             struct user *tmp = NULL;
             for(int i = 0; i < 100; i++)
@@ -348,7 +348,7 @@ int main()
                 msgsnd(tmp->msg, &s, sizeof(int), 0);
             }
         }
-        if(msgrcv(pub_queue, &one, 256, 7, IPC_NOWAIT) != -1) //zapytanie o listę grup
+        if(msgrcv(pub_queue, &one, 256, 7, IPC_NOWAIT) != -1) //handling requests for sending groups list
         {
             if(fork() == 0)
             {
@@ -374,7 +374,7 @@ int main()
                 exit(0);
             }
         }
-        if(msgrcv(pub_queue, &message_rec, 384, 8, IPC_NOWAIT) != -1) //wysyłanie wiadomości do grupy
+        if(msgrcv(pub_queue, &message_rec, 384, 8, IPC_NOWAIT) != -1) //sending message to a group
         {
             if(fork() == 0)
             {
@@ -428,7 +428,7 @@ int main()
                 exit(0);
             }
         }
-        if(msgrcv(pub_queue, &message_rec, 384, 9, IPC_NOWAIT) != -1) //wysłanie wiadomości do użytkownika
+        if(msgrcv(pub_queue, &message_rec, 384, 9, IPC_NOWAIT) != -1) //sending message to user
         {
             if(fork() == 0)
             {
@@ -464,7 +464,7 @@ int main()
                 exit(0);
             }
         }
-        if(msgrcv(pub_queue, &group_reqest, 128, 10, IPC_NOWAIT) != -1 || msgrcv(pub_queue, &group_reqest, 128, 11, IPC_NOWAIT) != -1)
+        if(msgrcv(pub_queue, &group_reqest, 128, 10, IPC_NOWAIT) != -1 || msgrcv(pub_queue, &group_reqest, 128, 11, IPC_NOWAIT) != -1) //handling requests for blocking user or group
         {
             
             int msg = -1, found = -1;
